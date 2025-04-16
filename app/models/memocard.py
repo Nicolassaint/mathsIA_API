@@ -1,6 +1,6 @@
 from typing import List, Optional, Union, Dict, Any
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from bson import ObjectId
 from app.core.config import settings
 from app.models.user import PyObjectId
@@ -17,8 +17,8 @@ class MemocardBase(BaseModel):
     is_active: bool = True
     tags: List[str] = []
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "title": "Pythagore - Application directe",
                 "description": "Application directe du théorème de Pythagore dans un triangle rectangle",
@@ -31,19 +31,21 @@ class MemocardBase(BaseModel):
                 "tags": ["pythagore", "triangle", "rectangle"]
             }
         }
+    )
 
 class TrueFalseContent(BaseModel):
     """Content for true/false questions"""
     statement: str
     correct_answer: bool
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "statement": "Dans un triangle rectangle, le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés.",
                 "correct_answer": True
             }
         }
+    )
 
 class MultipleChoiceContent(BaseModel):
     """Content for multiple choice questions"""
@@ -51,8 +53,8 @@ class MultipleChoiceContent(BaseModel):
     options: List[str]
     correct_options: List[int]  # Indices of correct options
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "question": "Quelles sont les propriétés du triangle rectangle ?",
                 "options": [
@@ -64,6 +66,7 @@ class MultipleChoiceContent(BaseModel):
                 "correct_options": [0, 2]
             }
         }
+    )
 
 class TextContent(BaseModel):
     """Content for text response questions"""
@@ -71,14 +74,15 @@ class TextContent(BaseModel):
     correct_answer: str
     case_sensitive: bool = False
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "question": "Comment s'appelle le théorème qui s'applique uniquement aux triangles rectangles ?",
                 "correct_answer": "théorème de pythagore",
                 "case_sensitive": False
             }
         }
+    )
 
 class NumericContent(BaseModel):
     """Content for numeric response questions"""
@@ -87,8 +91,8 @@ class NumericContent(BaseModel):
     tolerance: float = 0.0  # Tolerance for rounding errors
     unit: Optional[str] = None
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "question": "Dans un triangle rectangle, si les cathètes mesurent 3 cm et 4 cm, quelle est la longueur de l'hypoténuse ?",
                 "correct_answer": 5.0,
@@ -96,6 +100,7 @@ class NumericContent(BaseModel):
                 "unit": "cm"
             }
         }
+    )
 
 class MemocardInDB(MemocardBase):
     """Memocard model as stored in the database"""
@@ -105,9 +110,10 @@ class MemocardInDB(MemocardBase):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     content: Dict[str, Any]  # Will store the appropriate content based on type
     
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={
             ObjectId: str
-        } 
+        }
+    )

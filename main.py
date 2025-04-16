@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from jose import JWTError
 from pymongo.errors import DuplicateKeyError, OperationFailure
+from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.logging_config import logger
@@ -29,6 +30,21 @@ from app.api.routes.student.profile import router as student_profile_router
 from app.api.routes.student.memocards import router as student_memocards_router
 from app.api.routes.student.progress import router as student_progress_router
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Starting up...")
+    await connect_to_mongo()
+    await init_db()
+    logger.info("Startup complete")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down...")
+    await close_mongo_connection()
+    logger.info("Shutdown complete")
+
 # Create the FastAPI app
 app = FastAPI(
     title=settings.APP_NAME,
@@ -37,6 +53,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
 # Set up CORS
@@ -50,20 +67,6 @@ app.add_middleware(
 
 # Add logging middleware
 app.add_middleware(LoggingMiddleware)
-
-# Event handlers
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Starting up...")
-    await connect_to_mongo()
-    await init_db()
-    logger.info("Startup complete")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("Shutting down...")
-    await close_mongo_connection()
-    logger.info("Shutdown complete")
 
 # Exception handlers
 app.add_exception_handler(AppException, app_exception_handler)

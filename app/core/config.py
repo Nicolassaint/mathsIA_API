@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 import os
-from pydantic import BaseSettings, validator
+from pydantic import validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -36,8 +37,6 @@ class Settings(BaseSettings):
     # Difficulty levels
     DIFFICULTY_LEVELS: List[str] = ["easy", "medium", "hard", "expert"]
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 settings = Settings() 

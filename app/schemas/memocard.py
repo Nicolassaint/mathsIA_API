@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from app.core.config import settings
 from app.models.memocard import TrueFalseContent, MultipleChoiceContent, TextContent, NumericContent
 
@@ -17,26 +17,27 @@ class MemocardCreate(BaseModel):
     tags: List[str] = []
     content: Dict[str, Any]
     
-    @validator("level")
+    @field_validator("level")
     def level_must_be_valid(cls, v):
         if v not in settings.SCHOOL_LEVELS:
             raise ValueError(f"Level must be one of {settings.SCHOOL_LEVELS}")
         return v
     
-    @validator("difficulty")
+    @field_validator("difficulty")
     def difficulty_must_be_valid(cls, v):
         if v not in settings.DIFFICULTY_LEVELS:
             raise ValueError(f"Difficulty must be one of {settings.DIFFICULTY_LEVELS}")
         return v
     
-    @validator("type")
+    @field_validator("type")
     def type_must_be_valid(cls, v):
         if v not in settings.MEMOCARD_TYPES:
             raise ValueError(f"Type must be one of {settings.MEMOCARD_TYPES}")
         return v
     
-    @validator("content")
-    def validate_content(cls, v, values):
+    @field_validator("content")
+    def validate_content(cls, v, info):
+        values = info.data
         if "type" not in values:
             raise ValueError("Type is required to validate content")
         
@@ -57,8 +58,8 @@ class MemocardCreate(BaseModel):
         
         return v
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "title": "Pythagore - Application directe",
                 "description": "Application directe du théorème de Pythagore dans un triangle rectangle",
@@ -77,6 +78,7 @@ class MemocardCreate(BaseModel):
                 }
             }
         }
+    )
 
 class MemocardUpdate(BaseModel):
     """Schema for updating a memocard"""
@@ -90,20 +92,20 @@ class MemocardUpdate(BaseModel):
     tags: Optional[List[str]] = None
     content: Optional[Dict[str, Any]] = None
     
-    @validator("level")
+    @field_validator("level")
     def level_must_be_valid(cls, v):
         if v is not None and v not in settings.SCHOOL_LEVELS:
             raise ValueError(f"Level must be one of {settings.SCHOOL_LEVELS}")
         return v
     
-    @validator("difficulty")
+    @field_validator("difficulty")
     def difficulty_must_be_valid(cls, v):
         if v is not None and v not in settings.DIFFICULTY_LEVELS:
             raise ValueError(f"Difficulty must be one of {settings.DIFFICULTY_LEVELS}")
         return v
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "title": "Pythagore - Application directe (Update)",
                 "difficulty": "easy",
@@ -115,6 +117,7 @@ class MemocardUpdate(BaseModel):
                 }
             }
         }
+    )
 
 class MemocardResponse(BaseModel):
     """Schema for memocard response"""
@@ -132,8 +135,8 @@ class MemocardResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "id": "5f7c7f3b9c4a8e1b3c8d7f6f",
                 "title": "Pythagore - Application directe",
@@ -154,4 +157,5 @@ class MemocardResponse(BaseModel):
                 "created_at": "2023-01-01T00:00:00Z",
                 "updated_at": "2023-01-01T00:00:00Z"
             }
-        } 
+        }
+    )

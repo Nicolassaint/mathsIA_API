@@ -1,6 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
 from app.core.config import settings
 from app.models.user import StudentProfile
 
@@ -13,20 +13,21 @@ class UserCreate(BaseModel):
     role: str = Field(..., description="User role", enum=settings.USER_ROLES)
     student_profile: Optional[StudentProfile] = None
     
-    @validator("role")
+    @field_validator("role")
     def role_must_be_valid(cls, v):
         if v not in settings.USER_ROLES:
             raise ValueError(f"Role must be one of {settings.USER_ROLES}")
         return v
     
-    @validator("student_profile")
-    def validate_student_profile(cls, v, values):
+    @field_validator("student_profile")
+    def validate_student_profile(cls, v, info):
+        values = info.data
         if "role" in values and values["role"] == "student" and v is None:
             raise ValueError("Student profile is required for student role")
         return v
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "username": "johndoe",
                 "email": "john.doe@example.com",
@@ -40,6 +41,7 @@ class UserCreate(BaseModel):
                 }
             }
         }
+    )
 
 class UserUpdate(BaseModel):
     """Schema for updating a user"""
@@ -49,8 +51,8 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
     student_profile: Optional[StudentProfile] = None
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "full_name": "John Doe Updated",
                 "student_profile": {
@@ -59,6 +61,7 @@ class UserUpdate(BaseModel):
                 }
             }
         }
+    )
 
 class UserResponse(BaseModel):
     """Schema for user response"""
@@ -73,8 +76,8 @@ class UserResponse(BaseModel):
     last_login: Optional[datetime] = None
     student_profile: Optional[StudentProfile] = None
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "id": "5f7c7f3b9c4a8e1b3c8d7f6e",
                 "username": "johndoe",
@@ -91,4 +94,5 @@ class UserResponse(BaseModel):
                     "birth_date": "2007-01-01T00:00:00Z"
                 }
             }
-        } 
+        }
+    )

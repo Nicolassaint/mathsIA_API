@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, ConfigDict
 from app.models.response import StudentProgress
 
 class ResponseCreate(BaseModel):
@@ -9,14 +9,15 @@ class ResponseCreate(BaseModel):
     answer: Any  # Can be bool, int, str, float, or list of ints depending on question type
     time_spent_seconds: Optional[int] = None
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "memocard_id": "5f7c7f3b9c4a8e1b3c8d7f6f",
                 "answer": 5.0,
                 "time_spent_seconds": 45
             }
         }
+    )
 
 class ResponseResponse(BaseModel):
     """Schema for response response"""
@@ -30,8 +31,8 @@ class ResponseResponse(BaseModel):
     attempts: int
     created_at: datetime
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "id": "5f7c7f3b9c4a8e1b3c8d7f70",
                 "student_id": "5f7c7f3b9c4a8e1b3c8d7f6e",
@@ -44,14 +45,15 @@ class ResponseResponse(BaseModel):
                 "created_at": "2023-01-01T00:00:00Z"
             }
         }
+    )
 
 class ProgressResponse(BaseModel):
     """Schema for progress response"""
     student_id: str
     progress: StudentProgress
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "student_id": "5f7c7f3b9c4a8e1b3c8d7f6e",
                 "progress": {
@@ -73,4 +75,5 @@ class ProgressResponse(BaseModel):
                     }
                 }
             }
-        } 
+        }
+    )

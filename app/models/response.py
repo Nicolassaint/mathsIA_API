@@ -1,6 +1,6 @@
 from typing import List, Optional, Union, Dict, Any
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from bson import ObjectId
 from app.models.user import PyObjectId
 
@@ -10,18 +10,19 @@ class ResponseBase(BaseModel):
     memocard_id: PyObjectId
     answer: Any  # Can be bool, int, str, float, or list of ints depending on question type
     
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        json_encoders={
             ObjectId: str
-        }
-        schema_extra = {
+        },
+        json_schema_extra={
             "example": {
                 "student_id": "5f7c7f3b9c4a8e1b3c8d7f6e",
                 "memocard_id": "5f7c7f3b9c4a8e1b3c8d7f6f",
                 "answer": 5.0
             }
         }
+    )
 
 class ResponseInDB(ResponseBase):
     """Response model as stored in the database"""
@@ -32,13 +33,13 @@ class ResponseInDB(ResponseBase):
     time_spent_seconds: Optional[int] = None
     attempts: int = 1
     
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={
             ObjectId: str
-        }
-        schema_extra = {
+        },
+        json_schema_extra={
             "example": {
                 "student_id": "5f7c7f3b9c4a8e1b3c8d7f6e",
                 "memocard_id": "5f7c7f3b9c4a8e1b3c8d7f6f",
@@ -49,6 +50,7 @@ class ResponseInDB(ResponseBase):
                 "attempts": 1
             }
         }
+    )
 
 class StudentProgress(BaseModel):
     """Student progress statistics"""
@@ -60,8 +62,8 @@ class StudentProgress(BaseModel):
     by_difficulty: Dict[str, Dict[str, Any]] = {}
     by_subject: Dict[str, Dict[str, Any]] = {}
     
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "total_memocards": 100,
                 "answered_memocards": 50,
@@ -80,4 +82,5 @@ class StudentProgress(BaseModel):
                     "Calcul": {"total": 30, "answered": 15, "correct": 13, "accuracy": 86.7}
                 }
             }
-        } 
+        }
+    )
