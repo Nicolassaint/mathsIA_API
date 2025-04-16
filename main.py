@@ -6,6 +6,7 @@ from fastapi.openapi.utils import get_openapi
 from jose import JWTError
 from pymongo.errors import DuplicateKeyError, OperationFailure
 from contextlib import asynccontextmanager
+from fastapi_mcp import FastApiMCP
 
 from app.core.config import settings
 from app.core.logging_config import logger
@@ -134,6 +135,19 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
+# Set up MCP server
+mcp = FastApiMCP(
+    app,
+    name="MathsIA API MCP",
+    description="MCP server for MathsIA API, a memocard system for math learning",
+    base_url=f"http://{settings.HOST}:{settings.PORT}",
+    describe_all_responses=True,
+    describe_full_response_schema=True
+)
+
+# Mount the MCP server to the app
+mcp.mount()
+
 # Run the application
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("main:app", host=settings.HOST, port=settings.PORT, reload=True) 

@@ -23,6 +23,7 @@ MathsIA API est une application FastAPI qui permet la gestion d'un système de m
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - Validation de données
 - [Python-Jose](https://github.com/mpdavis/python-jose) - Gestion des JWT
 - [Uvicorn](https://www.uvicorn.org/) - Serveur ASGI
+- [FastAPI-MCP](https://github.com/TadataInc/fastapi-mcp) - Intégration Model Control Protocol pour l'IA
 
 ## 🏁 Mise en route
 
@@ -63,6 +64,35 @@ La documentation interactive de l'API est disponible aux URLs suivantes:
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+- Serveur MCP: http://localhost:8000/mcp
+
+### 🤖 Utilisation avec MCP (Model Control Protocol)
+
+MathsIA API intègre FastAPI-MCP, permettant aux modèles d'IA comme Claude, GPT, et autres de contrôler l'API directement.
+
+#### Connexion avec Cursor
+
+1. Lancez l'application
+2. Dans Cursor, allez dans Settings -> MCP
+3. Utilisez l'URL `http://localhost:8000/mcp` comme source SSE
+4. Cursor découvrira automatiquement toutes les commandes disponibles
+
+#### Connexion avec Claude Desktop ou d'autres clients
+
+1. Lancez l'application
+2. Installez mcp-proxy: `uv tool install mcp-proxy`
+3. Ajoutez dans le fichier de configuration de Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "mathsia-api-mcp-proxy": {
+        "command": "mcp-proxy",
+        "args": ["http://127.0.0.1:8000/mcp"]
+    }
+  }
+}
+```
 
 ## 🔄 Endpoints principaux
 
