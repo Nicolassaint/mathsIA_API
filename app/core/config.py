@@ -8,8 +8,8 @@ load_dotenv()
 
 class Settings(BaseSettings):
     APP_NAME: str = "MathsIA API"
-    ENVIRONMENT: str = "development"
-    DEBUG: bool = True
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     API_V1_PREFIX: str = "/api"
     
     # Server
@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # MongoDB
     MONGODB_URL: str = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "mathsia_db")
+    MONGODB_USERNAME: str = os.getenv("MONGODB_USERNAME", "")
+    MONGODB_PASSWORD: str = os.getenv("MONGODB_PASSWORD", "")
+    MONGODB_AUTH_SOURCE: str = os.getenv("MONGODB_AUTH_SOURCE", "admin")
     
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
