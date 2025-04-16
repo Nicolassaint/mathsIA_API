@@ -35,7 +35,7 @@ MathsIA API est une application FastAPI qui permet la gestion d'un système de m
 
 1. Cloner le dépôt
 ```bash
-git clone https://github.com/votre-utilisateur/mathsIA_api.git
+git clone https://github.com/nicolassaint/mathsIA_api.git
 cd mathsIA_api
 ```
 
@@ -182,12 +182,3 @@ mathsIA_api/
 ├── README.md               # Documentation
 └── requirements.txt        # Dépendances Python
 ```
-
-## 📄 Licence
-
-Ce projet est sous licence MIT.
-
-## 🙏 Remerciements
-
-- L'équipe de FastAPI pour l'excellent framework
-- Tous les contributeurs du projet 
